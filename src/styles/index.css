@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    min-height: 100vh;
+    font-family: theme('fontFamily.sans');
+    color: theme('colors.zinc.200');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #060608;
+    background-image: theme('backgroundImage.hero-mesh');
+    background-attachment: fixed;
+  }
+  ::selection {
+    background-color: rgb(245 158 11 / 0.35);
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(245, 158, 11, 0.35) transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.35);
+    border-radius: 999px;
+  }
+  .glass {
+    border: 1px solid rgb(255 255 255 / 0.07);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    background-color: rgb(255 255 255 / 0.035);
+    box-shadow: theme('boxShadow.glass');
+  }
+  .glass-strong {
+    border: 1px solid rgb(255 255 255 / 0.09);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    background-color: rgb(15 17 23 / 0.75);
+    box-shadow: theme('boxShadow.glass');
+  }
+  .text-gradient-amber {
+    background-image: linear-gradient(
+      to bottom right,
+      theme('colors.amber.200'),
+      theme('colors.amber.400'),
+      theme('colors.amber.700')
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Без @apply — только обычный CSS, чтобы PostCSS не падал на разборе утилит */
+  .ring-focus:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #060608, 0 0 0 4px rgb(245 158 11 / 0.45);
+  }
+}
