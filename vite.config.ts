@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  /** Только для локального `npm run dev`: прокси на Express API. На Vercel не используется. */
+  /** Только для локального `npm run dev`: прокси на Express API. На статическом деплое (Cloudflare Pages / Vercel static) не используется. */
   const apiPort = env.APP_PORT || env.PORT || '8787';
 
   return {

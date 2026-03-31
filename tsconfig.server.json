@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["server/**/*.ts", "api/**/*.ts", "functions/lib/formatApplicationMessage.ts"]
+}

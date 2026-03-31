@@ -1,6 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { ServerlessRequest, ServerlessResponse } from './serverlessHandlerTypes.js';
 
-export default function handler(req: VercelRequest, res: VercelResponse): void {
+export default function handler(req: ServerlessRequest, res: ServerlessResponse): void {
   if (req.method !== 'GET') {
     res.status(405).json({ ok: false });
     return;

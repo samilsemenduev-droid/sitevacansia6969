@@ -1,3 +1,7 @@
+import { formatApplicationMessage } from '../../functions/lib/formatApplicationMessage.js';
+
+export { formatApplicationMessage };
+
 const TELEGRAM_SEND_TIMEOUT_MS = 25_000;
 
 /**
@@ -42,37 +46,4 @@ export async function sendTelegramMessage(text: string): Promise<void> {
     const msg = (data.description && String(data.description).trim()) || res.statusText || 'Telegram API error';
     throw new Error(`Telegram: ${msg}${code}`);
   }
-}
-
-export function formatApplicationMessage(payload: {
-  name: string;
-  phone: string;
-  cityName: string;
-  telegramUsername: string;
-  vacancyTitle: string;
-  comment: string;
-  submittedAt: string;
-  sourceLabel: string;
-  sourceUrl?: string;
-}): string {
-  const commentBlock = payload.comment.trim() ? payload.comment.trim() : '—';
-  const sourceLine = payload.sourceUrl
-    ? `${payload.sourceLabel}\n${payload.sourceUrl}`
-    : payload.sourceLabel;
-  const tg = payload.telegramUsername.startsWith('@')
-    ? payload.telegramUsername
-    : `@${payload.telegramUsername}`;
-
-  return [
-    'Новая заявка с сайта',
-    '',
-    `Имя: ${payload.name}`,
-    `Телефон: ${payload.phone}`,
-    `Город: ${payload.cityName}`,
-    `Username Telegram: ${tg}`,
-    `Вакансия: ${payload.vacancyTitle}`,
-    `Комментарий: ${commentBlock}`,
-    `Дата: ${payload.submittedAt}`,
-    `Источник: ${sourceLine}`,
-  ].join('\n');
 }

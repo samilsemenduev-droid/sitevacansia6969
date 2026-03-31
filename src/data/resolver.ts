@@ -1,24 +1,26 @@
+import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
 import type { City, SiteContent, Vacancy, VacancyDetail } from '@/types';
 import { deepMerge } from '@/utils/deepMerge';
 import { applyCityPlaceholders } from '@/utils/placeholders';
 
-function mapStringsInDetail(d: VacancyDetail, cityName: string): VacancyDetail {
+function mapStringsInDetail(d: Partial<VacancyDetail>, cityName: string): VacancyDetail {
+  const faq = Array.isArray(d.faq) ? d.faq : [];
+  const str = (v: unknown) => (typeof v === 'string' ? v : '');
   return {
-    ...d,
-    premiumLead: applyCityPlaceholders(d.premiumLead, cityName),
-    workDescription: applyCityPlaceholders(d.workDescription, cityName),
-    pay: applyCityPlaceholders(d.pay, cityName),
-    details: applyCityPlaceholders(d.details, cityName),
-    conditions: applyCityPlaceholders(d.conditions, cityName),
-    schedule: applyCityPlaceholders(d.schedule, cityName),
-    requirements: applyCityPlaceholders(d.requirements, cityName),
-    faq: d.faq.map((f) => ({
-      ...f,
-      question: applyCityPlaceholders(f.question, cityName),
-      answer: applyCityPlaceholders(f.answer, cityName),
+    premiumLead: applyCityPlaceholders(str(d.premiumLead), cityName),
+    workDescription: applyCityPlaceholders(str(d.workDescription), cityName),
+    pay: applyCityPlaceholders(str(d.pay), cityName),
+    details: applyCityPlaceholders(str(d.details), cityName),
+    conditions: applyCityPlaceholders(str(d.conditions), cityName),
+    schedule: applyCityPlaceholders(str(d.schedule), cityName),
+    requirements: applyCityPlaceholders(str(d.requirements), cityName),
+    faq: faq.map((f, i) => ({
+      id: typeof f?.id === 'string' ? f.id : `faq-${i}`,
+      question: applyCityPlaceholders(str(f?.question), cityName),
+      answer: applyCityPlaceholders(str(f?.answer), cityName),
     })),
-    telegramUrl: d.telegramUrl,
-    imageUrl: d.imageUrl,
+    telegramUrl: str(d.telegramUrl),
+    imageUrl: str(d.imageUrl),
   };
 }
 
@@ -27,16 +29,21 @@ export function resolveVacancyDetail(
   city: City,
   site: SiteContent
 ): VacancyDetail {
-  const patch = vacancy.cityOverrides[city.id] ?? {};
+  const patch = vacancy.cityOverrides?.[city.id] ?? {};
+  const baseRaw = vacancy.baseDetail;
+  const baseRecord: Record<string, unknown> =
+    baseRaw != null && typeof baseRaw === 'object' && !Array.isArray(baseRaw)
+      ? (baseRaw as Record<string, unknown>)
+      : {};
   const merged = deepMerge(
-    vacancy.baseDetail as unknown as Record<string, unknown>,
+    baseRecord,
     patch as unknown as Record<string, unknown>
-  ) as unknown as VacancyDetail;
+  ) as unknown as Partial<VacancyDetail>;
   if (patch.faq && Array.isArray(patch.faq)) {
     merged.faq = patch.faq;
   }
   const tg =
-    merged.telegramUrl?.trim() || site.defaultTelegramUrl?.trim() || 'https://t.me/';
+    merged.telegramUrl?.trim() || site.defaultTelegramUrl?.trim() || CONTACT_TELEGRAM_URL;
   merged.telegramUrl = tg;
   return mapStringsInDetail(merged, city.name);
 }

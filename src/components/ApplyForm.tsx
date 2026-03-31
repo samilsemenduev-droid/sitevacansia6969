@@ -83,7 +83,7 @@ export function ApplyForm({
       setFeedback('Укажите город.');
       return;
     }
-    if (!tg || !isTelegramUsernamePlausible(telegramUsername)) {
+    if (tg && !isTelegramUsernamePlausible(telegramUsername)) {
       setUiState('error');
       setFeedback(
         'Укажите корректный username Telegram: латиница, 5–32 символа, начинается с буквы (можно с @).'
@@ -133,7 +133,7 @@ export function ApplyForm({
         phone: record.phone,
         cityId: record.cityId,
         cityName: record.cityName,
-        telegramUsername: record.telegramUsername,
+        telegramUsername: record.telegramUsername || undefined,
         vacancyId: record.vacancyId,
         vacancyTitle: record.vacancyTitle,
         comment: record.comment,

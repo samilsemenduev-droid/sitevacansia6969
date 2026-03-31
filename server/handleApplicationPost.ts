@@ -76,14 +76,14 @@ export async function handleApplicationPost(body: unknown): Promise<ApplicationP
           minute: '2-digit',
         });
 
-    if (!name || !phone || !cityName || !vacancyId || !vacancyTitle) {
+    if (!name || !phone || !cityName || !vacancyTitle) {
       return {
         status: 400,
         json: { ok: false, error: 'Заполните имя, телефон, город и вакансию.' },
       };
     }
 
-    if (!telegramUsername || !isTelegramUsernamePlausible(telegramUsername)) {
+    if (telegramUsername && !isTelegramUsernamePlausible(telegramUsername)) {
       return {
         status: 400,
         json: {
@@ -105,12 +105,13 @@ export async function handleApplicationPost(body: unknown): Promise<ApplicationP
       name,
       phone,
       cityName,
-      telegramUsername,
       vacancyTitle,
       comment,
       submittedAt,
       sourceLabel: 'Сайт вакансий',
       sourceUrl,
+      telegramUsername: telegramUsername || undefined,
+      vacancyId: vacancyId || undefined,
     });
 
     const textWithMeta =

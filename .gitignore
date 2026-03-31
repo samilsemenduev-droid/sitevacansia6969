@@ -1,7 +1,38 @@
+# Dependencies
 node_modules
+
+# Build
 dist
+*.local
+
+# Environment (секреты)
 .env
 .env.local
 .env.*.local
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Vite / tooling cache
+.vite
+*.tsbuildinfo
+
+# OS
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor (опционально — раскомментируйте, если не хотите коммитить настройки IDE)
+# .idea
+# .vscode
+
+# Archives / temp
 *.zip
+*.tmp
+*.temp
+.cache

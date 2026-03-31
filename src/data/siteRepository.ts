@@ -1,18 +1,54 @@
-import type { SiteData, Vacancy, VacancyIconId } from '@/types';
+import type { City, SiteData, Vacancy, VacancyIconId } from '@/types';
 import { getDefaultSiteData, SITE_PLATFORM_URL } from './defaultSeed';
 import { STORAGE_SITE_DATA } from './storageKeys';
+
+function storageGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSet(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function storageRemove(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
 
 function safeParse(raw: string | null): SiteData | null {
   if (!raw) return null;
   try {
-    const v = JSON.parse(raw) as SiteData;
-    if (v && v.version === 1 && Array.isArray(v.cities) && Array.isArray(v.vacancies) && v.site) {
-      return v;
+    const v = JSON.parse(raw) as unknown;
+    if (
+      !v ||
+      typeof v !== 'object' ||
+      (v as SiteData).version !== 1 ||
+      !Array.isArray((v as SiteData).cities) ||
+      !Array.isArray((v as SiteData).vacancies) ||
+      !isPlainObject((v as SiteData).site)
+    ) {
+      return null;
     }
+    return v as SiteData;
   } catch {
-    /* ignore */
+    return null;
   }
-  return null;
 }
 
 /** Старый плейсхолдер из сида — в localStorage у многих остался именно он. */
@@ -24,23 +60,80 @@ function migratePlatformUrl(raw: string | undefined): string {
   return u;
 }
 
+function isValidCity(c: unknown): c is City {
+  return (
+    c != null &&
+    typeof c === 'object' &&
+    typeof (c as City).id === 'string' &&
+    typeof (c as City).name === 'string'
+  );
+}
+
+function isValidVacancy(v: unknown): v is Vacancy {
+  return v != null && typeof v === 'object' && typeof (v as Vacancy).id === 'string';
+}
+
 export function loadSiteData(): SiteData {
-  const stored = safeParse(localStorage.getItem(STORAGE_SITE_DATA));
+  try {
+    return loadSiteDataUnchecked();
+  } catch (e) {
+    console.error('[vacansia] loadSiteData failed, resetting storage', e);
+    storageRemove(STORAGE_SITE_DATA);
+    const fresh = getDefaultSiteData();
+    trySaveSiteData(fresh);
+    return fresh;
+  }
+}
+
+function loadSiteDataUnchecked(): SiteData {
+  const stored = safeParse(storageGet(STORAGE_SITE_DATA));
   if (stored) {
-    const prev = stored.site.platformUrl?.trim() ?? '';
-    const normalized = normalizeSiteData(stored);
+    let normalized: SiteData;
+    try {
+      normalized = normalizeSiteData(stored);
+    } catch (e) {
+      console.warn('[vacansia] normalizeSiteData failed, using default', e);
+      storageRemove(STORAGE_SITE_DATA);
+      const fresh = getDefaultSiteData();
+      trySaveSiteData(fresh);
+      return fresh;
+    }
+    if (normalized.cities.length === 0 || normalized.vacancies.length === 0) {
+      storageRemove(STORAGE_SITE_DATA);
+      const fresh = getDefaultSiteData();
+      trySaveSiteData(fresh);
+      return fresh;
+    }
+    const prev =
+      typeof stored.site.platformUrl === 'string' ? stored.site.platformUrl.trim() : '';
     if (normalized.site.platformUrl !== prev) {
-      saveSiteData(normalized);
+      trySaveSiteData(normalized);
     }
     return normalized;
   }
   const fresh = getDefaultSiteData();
-  saveSiteData(fresh);
+  trySaveSiteData(fresh);
   return fresh;
 }
 
+function trySaveSiteData(data: SiteData): void {
+  try {
+    const json = JSON.stringify(normalizeSiteData(data));
+    if (!storageSet(STORAGE_SITE_DATA, json)) {
+      console.warn('[vacansia] localStorage.setItem failed (quota or disabled)');
+    }
+  } catch (e) {
+    console.warn('[vacansia] trySaveSiteData failed', e);
+  }
+}
+
 export function saveSiteData(data: SiteData): void {
-  localStorage.setItem(STORAGE_SITE_DATA, JSON.stringify(normalizeSiteData(data)));
+  try {
+    const json = JSON.stringify(normalizeSiteData(data));
+    storageSet(STORAGE_SITE_DATA, json);
+  } catch (e) {
+    console.warn('[vacansia] saveSiteData failed', e);
+  }
 }
 
 const LEGACY_LEAFLET_ID = 'leaflet';
@@ -55,22 +148,37 @@ function stripLeafletVacancies(list: Vacancy[]): Vacancy[] {
 }
 
 function normalizeSiteData(data: SiteData): SiteData {
-  const cities = [...data.cities]
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'ru'))
+  const rawCities = Array.isArray(data.cities) ? data.cities : [];
+  const rawVacancies = Array.isArray(data.vacancies) ? data.vacancies : [];
+  const cities = rawCities
+    .filter(isValidCity)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, 'ru'))
     .map((c, i) => ({ ...c, order: c.order ?? i }));
-  const vacancies = stripLeafletVacancies([...data.vacancies])
-    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'ru'))
+  const vacancies = stripLeafletVacancies(rawVacancies.filter(isValidVacancy))
+    .sort(
+      (a, b) =>
+        (a.order ?? 0) - (b.order ?? 0) ||
+        String(a.title ?? '').localeCompare(String(b.title ?? ''), 'ru')
+    )
     .map((v, i) => ({
       ...v,
       order: v.order ?? i,
       iconId: normalizeVacancyIconId(v.iconId as string),
-      cityOverrides: v.cityOverrides || {},
+      cityOverrides: isPlainObject(v.cityOverrides) ? v.cityOverrides : {},
     }));
+  const siteDefaults = getDefaultSiteData().site;
+  const fromStored = (isPlainObject(data.site) ? data.site : {}) as Partial<SiteData['site']>;
+  const platformRaw =
+    typeof fromStored.platformUrl === 'string' ? fromStored.platformUrl : undefined;
   return {
     version: 1,
     cities,
     vacancies,
-    site: { ...data.site, platformUrl: migratePlatformUrl(data.site.platformUrl) },
+    site: {
+      ...siteDefaults,
+      ...fromStored,
+      platformUrl: migratePlatformUrl(platformRaw),
+    },
   };
 }
 
@@ -87,7 +195,11 @@ export function exportSiteDataJson(data: SiteData): string {
 export function importSiteDataJson(json: string): SiteData | null {
   const parsed = safeParse(json);
   if (!parsed) return null;
-  const n = normalizeSiteData(parsed);
-  saveSiteData(n);
-  return n;
+  try {
+    const n = normalizeSiteData(parsed);
+    saveSiteData(n);
+    return n;
+  } catch {
+    return null;
+  }
 }

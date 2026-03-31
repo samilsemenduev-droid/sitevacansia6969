@@ -13,7 +13,11 @@ function readAll(): JobApplication[] {
 }
 
 function writeAll(list: JobApplication[]): void {
-  localStorage.setItem(STORAGE_APPLICATIONS, JSON.stringify(list));
+  try {
+    localStorage.setItem(STORAGE_APPLICATIONS, JSON.stringify(list));
+  } catch (e) {
+    console.warn('[vacansia] applications writeAll failed', e);
+  }
 }
 
 function normalizeApplication(raw: unknown): JobApplication | null {
@@ -87,5 +91,9 @@ export function listApplications(): JobApplication[] {
 }
 
 export function clearApplications(): void {
-  localStorage.removeItem(STORAGE_APPLICATIONS);
+  try {
+    localStorage.removeItem(STORAGE_APPLICATIONS);
+  } catch (e) {
+    console.warn('[vacansia] clearApplications failed', e);
+  }
 }

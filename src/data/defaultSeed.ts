@@ -1,7 +1,6 @@
+import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
 import type { City, SiteData, Vacancy, VacancyDetail } from '@/types';
 import { SEED_CITY_NAMES } from './cityNames';
-
-const TG_PLACEHOLDER = 'https://t.me/change_me_manager';
 
 /** Ссылка на площадку (карточка «Площадка»). */
 export const SITE_PLATFORM_URL =
@@ -31,7 +30,7 @@ function detailCourier(): VacancyDetail {
       { q: 'Нужно что‑то продавать?', a: 'Нет, только доставка и раскладка по точкам, без встреч с получателями.' },
       { q: 'Вакансия актуальна?', a: 'Да — уточняйте свободные слоты у куратора в Telegram.' },
     ]),
-    telegramUrl: TG_PLACEHOLDER,
+    telegramUrl: CONTACT_TELEGRAM_URL,
     imageUrl: '',
   };
 }
@@ -51,7 +50,7 @@ function detailCarrier(): VacancyDetail {
       { q: 'Когда выплаты?', a: 'Два раза в неделю по согласованному графику.' },
       { q: 'Расходы в дороге?', a: 'Компенсируем по регламенту — всё фиксируем заранее.' },
     ]),
-    telegramUrl: TG_PLACEHOLDER,
+    telegramUrl: CONTACT_TELEGRAM_URL,
     imageUrl: '',
   };
 }
@@ -76,7 +75,7 @@ function detailGraffiti(): VacancyDetail {
       { q: 'Как получить деньги за баллончики?', a: 'Пришлите чек — возместим после проверки. Без чека возврат не производится.' },
       { q: 'Почему от 25 граффити?', a: 'Так устроена выплата: набираете минимум, затем начисление после проверки всех работ.' },
     ]),
-    telegramUrl: TG_PLACEHOLDER,
+    telegramUrl: CONTACT_TELEGRAM_URL,
     imageUrl: '',
   };
 }
@@ -137,7 +136,7 @@ export function getDefaultSiteData(): SiteData {
       heroSubtitle: 'Город, направление, заявка — дальше созвонимся и договоримся.',
       reviewsChannelUrl: 'https://t.me/your_reviews_channel',
       platformUrl: SITE_PLATFORM_URL,
-      defaultTelegramUrl: TG_PLACEHOLDER,
+      defaultTelegramUrl: CONTACT_TELEGRAM_URL,
       applySectionTitle: 'Оставить заявку',
       applySectionSubtitle: 'Имя и телефон — перезвоним в рабочее время.',
       footerNote:

@@ -1,3 +1,4 @@
+import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, X } from 'lucide-react';
 import type { VacancyDetail, VacancyIconId } from '@/types';
@@ -144,10 +145,10 @@ export function VacancyDetailSheet({
 
             <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <ButtonLink
-                href={detail.telegramUrl}
+                href={CONTACT_TELEGRAM_URL}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => trackEvent('telegram_connect', { href: detail.telegramUrl })}
+                onClick={() => trackEvent('telegram_connect', { href: CONTACT_TELEGRAM_URL })}
                 className="w-full flex-1 font-bold"
               >
                 Связаться

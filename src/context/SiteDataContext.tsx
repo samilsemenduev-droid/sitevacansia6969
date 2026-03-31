@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from 'react';
@@ -17,7 +18,14 @@ type SiteDataContextValue = {
 const SiteDataContext = createContext<SiteDataContextValue | null>(null);
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
-  const [data, setDataState] = useState<SiteData>(() => loadSiteData());
+  const [data, setDataState] = useState<SiteData>(() => {
+    console.info('[vacansia] SiteDataProvider: loadSiteData() in useState init');
+    return loadSiteData();
+  });
+
+  useEffect(() => {
+    console.info('[vacansia] SiteDataProvider: mounted, cities=%s vacancies=%s', data.cities.length, data.vacancies.length);
+  }, [data.cities.length, data.vacancies.length]);
 
   const setData = useCallback((next: SiteData | ((prev: SiteData) => SiteData)) => {
     setDataState((prev) => {

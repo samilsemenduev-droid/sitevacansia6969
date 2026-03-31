@@ -1,3 +1,4 @@
+import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
 import type { Vacancy, VacancyDetail, VacancyIconId } from '@/types';
 import { newId } from '@/utils/id';
 
@@ -14,7 +15,7 @@ export function emptyVacancyDetail(): VacancyDetail {
       { id: 'faq-0', question: 'Вопрос', answer: 'Ответ' },
       { id: 'faq-1', question: '', answer: '' },
     ],
-    telegramUrl: '',
+    telegramUrl: CONTACT_TELEGRAM_URL,
     imageUrl: '',
   };
 }
