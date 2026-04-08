@@ -13,7 +13,7 @@ export type VacancyDetail = {
   imageUrl: string;
 };
 
-export type VacancyIconId = 'courier' | 'carrier' | 'graffiti';
+export type VacancyIconId = 'courier' | 'carrier';
 
 export type Vacancy = {
   id: string;

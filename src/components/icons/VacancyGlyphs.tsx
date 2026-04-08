@@ -13,7 +13,7 @@ function useGrad(prefix: string) {
   };
 }
 
-/** Курьер: велосипед, заливка + градиент */
+/** Пеший курьер (иконка доставки), заливка + градиент */
 export function GlyphCourier({ size = 56, className }: GlyphProps) {
   const { fill, filter, gid, fid } = useGrad('c');
   return (
@@ -91,48 +91,12 @@ export function GlyphCarrier({ size = 56, className }: GlyphProps) {
   );
 }
 
-/** Граффити: баллон + тег */
-export function GlyphGraffiti({ size = 56, className }: GlyphProps) {
-  const { fill, filter, gid, fid } = useGrad('g');
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" className={className} aria-hidden>
-      <defs>
-        <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fef08a" />
-          <stop offset="40%" stopColor="#f97316" />
-          <stop offset="100%" stopColor="#7f1d1d" />
-        </linearGradient>
-        <filter id={fid} x="-35%" y="-35%" width="170%" height="170%">
-          <feGaussianBlur stdDeviation="1.1" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <g filter={filter}>
-        <ellipse cx="32" cy="16" rx="10" ry="6" fill={fill} />
-        <rect x="24" y="18" width="16" height="32" rx="5" fill={fill} />
-        <rect x="28" y="48" width="8" height="6" rx="2" fill={fill} />
-        <path
-          fill={fill}
-          opacity="0.9"
-          d="M8 52 Q12 44 20 46 Q26 48 28 54 L22 56 Q16 50 8 52 Z"
-        />
-        <path fill="#0b0b0f" opacity="0.35" d="M26 24 H38 V28 H26 Z" />
-      </g>
-    </svg>
-  );
-}
-
 export function VacancyGlyph({ iconId, size, className }: GlyphProps & { iconId: VacancyIconId }) {
   switch (iconId) {
     case 'courier':
       return <GlyphCourier size={size} className={className} />;
     case 'carrier':
       return <GlyphCarrier size={size} className={className} />;
-    case 'graffiti':
-      return <GlyphGraffiti size={size} className={className} />;
     default:
       return <GlyphCourier size={size} className={className} />;
   }

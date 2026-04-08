@@ -5,9 +5,8 @@ import { createNewVacancy } from '@/data/factories';
 import { Button } from '@/components/ui/Button';
 
 const ICONS: { id: VacancyIconId; label: string }[] = [
-  { id: 'courier', label: 'Курьер (вело)' },
+  { id: 'courier', label: 'Пеший курьер' },
   { id: 'carrier', label: 'Водитель / перевоз' },
-  { id: 'graffiti', label: 'Граффитчик' },
 ];
 
 function OptionalField({

@@ -142,12 +142,21 @@ export function saveSiteData(data: SiteData): void {
 const LEGACY_LEAFLET_ID = 'leaflet';
 
 function normalizeVacancyIconId(raw: string | undefined): VacancyIconId {
-  if (raw === 'courier' || raw === 'carrier' || raw === 'graffiti') return raw;
+  if (raw === 'carrier') return 'carrier';
+  if (raw === 'courier' || raw === 'graffiti') return 'courier';
   return 'courier';
 }
 
-function stripLeafletVacancies(list: Vacancy[]): Vacancy[] {
-  return list.filter((v) => v.id !== LEGACY_LEAFLET_ID && v.slug !== LEGACY_LEAFLET_ID);
+const REMOVED_VACANCY_GRAFFITI = 'graffiti';
+
+function stripDeprecatedVacancies(list: Vacancy[]): Vacancy[] {
+  return list.filter(
+    (v) =>
+      v.id !== LEGACY_LEAFLET_ID &&
+      v.slug !== LEGACY_LEAFLET_ID &&
+      v.id !== REMOVED_VACANCY_GRAFFITI &&
+      v.slug !== REMOVED_VACANCY_GRAFFITI
+  );
 }
 
 function normalizeSiteData(data: SiteData): SiteData {
@@ -157,7 +166,7 @@ function normalizeSiteData(data: SiteData): SiteData {
     .filter(isValidCity)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, 'ru'))
     .map((c, i) => ({ ...c, order: c.order ?? i }));
-  const vacancies = stripLeafletVacancies(rawVacancies.filter(isValidVacancy))
+  const vacancies = stripDeprecatedVacancies(rawVacancies.filter(isValidVacancy))
     .sort(
       (a, b) =>
         (a.order ?? 0) - (b.order ?? 0) ||

@@ -1,5 +1,7 @@
+@'
 {
   "version": 1,
   "include": ["/api/*"],
   "exclude": []
 }
+'@ | Set-Content -Encoding UTF8 public\_routes.json
