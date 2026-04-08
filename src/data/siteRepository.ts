@@ -51,12 +51,15 @@ function safeParse(raw: string | null): SiteData | null {
   }
 }
 
-/** Старый плейсхолдер из сида — в localStorage у многих остался именно он. */
-const LEGACY_PLATFORM_PLACEHOLDER = /^https?:\/\/example\.com\/platform\/?$/i;
+/** Старые URL из сидов — подменяем на актуальный SITE_PLATFORM_URL. */
+const LEGACY_PLATFORM_PATTERNS = [
+  /^https?:\/\/example\.com\/platform\/?$/i,
+  /^https?:\/\/rutor\.or\.at\/forums\/kadrovoye-agent-stvo-satigo-rf-kz-rb\.1613\/?$/i,
+];
 
 function migratePlatformUrl(raw: string | undefined): string {
   const u = typeof raw === 'string' ? raw.trim() : '';
-  if (!u || LEGACY_PLATFORM_PLACEHOLDER.test(u)) return SITE_PLATFORM_URL;
+  if (!u || LEGACY_PLATFORM_PATTERNS.some((re) => re.test(u))) return SITE_PLATFORM_URL;
   return u;
 }
 

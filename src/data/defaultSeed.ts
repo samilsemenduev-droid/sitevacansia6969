@@ -2,9 +2,8 @@ import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
 import type { City, SiteData, Vacancy, VacancyDetail } from '@/types';
 import { SEED_CITY_NAMES } from './cityNames';
 
-/** Ссылка на площадку (карточка «Площадка»). */
-export const SITE_PLATFORM_URL =
-  'https://rutor.or.at/forums/kadrovoye-agent-stvo-satigo-rf-kz-rb.1613/';
+/** Ссылка на площадку (карточка «Перейти на сайт»). */
+export const SITE_PLATFORM_URL = 'http://hrs.best';
 
 function faq(items: { q: string; a: string }[]): VacancyDetail['faq'] {
   return items.map((it, i) => ({
