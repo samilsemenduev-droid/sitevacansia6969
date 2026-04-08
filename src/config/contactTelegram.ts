@@ -7,5 +7,6 @@
  */
 const fromEnv = (import.meta.env.VITE_CONTACT_TELEGRAM_URL ?? '').trim();
 
+/** Актуальный контакт для кнопки «Связаться» и сидов по умолчанию. */
 export const CONTACT_TELEGRAM_URL =
-  fromEnv || 'https://t.me/aljeksandra007';
+  fromEnv || 'https://t.me/viktorija_mngr1';

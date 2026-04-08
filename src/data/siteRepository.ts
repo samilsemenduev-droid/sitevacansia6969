@@ -1,4 +1,5 @@
-import type { City, SiteData, Vacancy, VacancyIconId } from '@/types';
+import { CONTACT_TELEGRAM_URL } from '@/config/contactTelegram';
+import type { City, SiteData, Vacancy, VacancyDetail, VacancyIconId } from '@/types';
 import { getDefaultSiteData, SITE_PLATFORM_URL } from './defaultSeed';
 import { STORAGE_SITE_DATA } from './storageKeys';
 
@@ -63,6 +64,32 @@ function migratePlatformUrl(raw: string | undefined): string {
   return u;
 }
 
+/** Старый контакт «Связаться» в localStorage → подменяем на актуальный из конфига. */
+const LEGACY_TELEGRAM_CONTACT = /t\.me\/aljeksandra007/i;
+
+function migrateTelegramContactUrl(raw: string | undefined): string {
+  const u = typeof raw === 'string' ? raw.trim() : '';
+  if (!u || LEGACY_TELEGRAM_CONTACT.test(u)) return CONTACT_TELEGRAM_URL;
+  return u;
+}
+
+function migrateVacancyTelegramUrls(v: Vacancy): Vacancy {
+  const baseDetail: VacancyDetail = {
+    ...v.baseDetail,
+    telegramUrl: migrateTelegramContactUrl(v.baseDetail?.telegramUrl),
+  };
+  const cityOverrides: Record<string, Partial<VacancyDetail>> = {};
+  for (const [cityId, patch] of Object.entries(v.cityOverrides ?? {})) {
+    if (!patch || typeof patch !== 'object') continue;
+    const p = patch as Partial<VacancyDetail>;
+    cityOverrides[cityId] =
+      typeof p.telegramUrl === 'string'
+        ? { ...p, telegramUrl: migrateTelegramContactUrl(p.telegramUrl) }
+        : { ...p };
+  }
+  return { ...v, baseDetail, cityOverrides };
+}
+
 function isValidCity(c: unknown): c is City {
   return (
     c != null &&
@@ -107,11 +134,7 @@ function loadSiteDataUnchecked(): SiteData {
       trySaveSiteData(fresh);
       return fresh;
     }
-    const prev =
-      typeof stored.site.platformUrl === 'string' ? stored.site.platformUrl.trim() : '';
-    if (normalized.site.platformUrl !== prev) {
-      trySaveSiteData(normalized);
-    }
+    trySaveSiteData(normalized);
     return normalized;
   }
   const fresh = getDefaultSiteData();
@@ -172,25 +195,29 @@ function normalizeSiteData(data: SiteData): SiteData {
         (a.order ?? 0) - (b.order ?? 0) ||
         String(a.title ?? '').localeCompare(String(b.title ?? ''), 'ru')
     )
-    .map((v, i) => ({
-      ...v,
-      order: v.order ?? i,
-      iconId: normalizeVacancyIconId(v.iconId as string),
-      cityOverrides: isPlainObject(v.cityOverrides) ? v.cityOverrides : {},
-    }));
+    .map((v, i) =>
+      migrateVacancyTelegramUrls({
+        ...v,
+        order: v.order ?? i,
+        iconId: normalizeVacancyIconId(v.iconId as string),
+        cityOverrides: isPlainObject(v.cityOverrides) ? v.cityOverrides : {},
+      })
+    );
   const siteDefaults = getDefaultSiteData().site;
   const fromStored = (isPlainObject(data.site) ? data.site : {}) as Partial<SiteData['site']>;
   const platformRaw =
     typeof fromStored.platformUrl === 'string' ? fromStored.platformUrl : undefined;
+  const mergedSite = {
+    ...siteDefaults,
+    ...fromStored,
+    platformUrl: migratePlatformUrl(platformRaw),
+  };
+  mergedSite.defaultTelegramUrl = migrateTelegramContactUrl(mergedSite.defaultTelegramUrl);
   return {
     version: 1,
     cities,
     vacancies,
-    site: {
-      ...siteDefaults,
-      ...fromStored,
-      platformUrl: migratePlatformUrl(platformRaw),
-    },
+    site: mergedSite,
   };
 }
 
