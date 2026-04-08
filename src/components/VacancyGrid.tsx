@@ -24,16 +24,21 @@ const item = {
 export function VacancyGrid({ vacancies }: { vacancies: Vacancy[] }) {
   const { openVacancy } = useUiSelection();
   const list = vacancies.filter((v) => v.enabled).sort((a, b) => a.order - b.order);
+  const threePlus = list.length >= 3;
+  const containerMax = threePlus ? 'max-w-5xl' : 'max-w-3xl';
+  const gridClass = threePlus
+    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+    : 'grid-cols-1 sm:grid-cols-2';
 
   return (
-    <section id="vakansii" className="scroll-mt-6 px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mx-auto w-full max-w-[1200px]">
+    <section id="vakansii" className="scroll-mt-6 px-4 py-8 sm:px-6 sm:py-10">
+      <div className={`mx-auto w-full ${containerMax}`}>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8 text-center font-display text-2xl font-extrabold tracking-tight text-white sm:mb-10 sm:text-3xl"
+          className="mb-8 text-center font-display text-2xl font-extrabold tracking-tight text-white sm:mb-9 sm:text-3xl"
         >
           Направления
         </motion.h2>
@@ -43,12 +48,12 @@ export function VacancyGrid({ vacancies }: { vacancies: Vacancy[] }) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-40px' }}
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          className={`mx-auto grid w-full gap-6 sm:gap-6 md:gap-8 ${gridClass}`}
         >
           {list.map((v) => (
-            <motion.li key={v.id} variants={item} className="flex h-full min-h-0">
+            <motion.li key={v.id} variants={item} className="flex h-full min-h-0 w-full justify-center sm:block">
               <motion.div
-                className="group relative flex h-full min-h-0 w-full flex-col"
+                className="group relative mx-auto flex h-full min-h-0 w-full max-w-md flex-col sm:mx-0 sm:max-w-none"
                 whileHover={{ y: -4, scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 28 }}
               >
@@ -66,14 +71,14 @@ export function VacancyGrid({ vacancies }: { vacancies: Vacancy[] }) {
                       trackEvent('vacancy_open', { vacancyId: v.id, title: v.title });
                       openVacancy(v.id);
                     }}
-                    className="ring-focus relative flex h-full min-h-0 w-full flex-col rounded-2xl border border-white/[0.04] bg-[#0f1117] px-5 pb-5 pt-6 text-left shadow-inner transition duration-300 group-hover:border-amber-500/20 group-hover:bg-[#12141c]"
+                    className="ring-focus relative flex h-full min-h-0 w-full flex-col items-center rounded-2xl border border-white/[0.04] bg-[#0f1117] px-5 pb-5 pt-6 text-center shadow-inner transition duration-300 group-hover:border-amber-500/20 group-hover:bg-[#12141c]"
                   >
-                    <VacancyIcon iconId={v.iconId} size={52} />
+                    <VacancyIcon iconId={v.iconId} size={56} />
                     <h3 className="mt-5 shrink-0 font-display text-xl font-bold text-white">{v.title}</h3>
-                    <p className="mt-2 h-[3rem] shrink-0 line-clamp-2 overflow-hidden text-sm font-medium leading-snug text-zinc-400">
+                    <p className="mt-3 min-h-[3.25rem] shrink-0 text-pretty text-sm font-medium leading-snug text-zinc-400 sm:min-h-[3.5rem]">
                       {v.shortDescription}
                     </p>
-                    <span className="mt-auto inline-flex w-fit shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-2.5 text-xs font-bold text-[#0b0b0f] shadow-glow-sm transition group-hover:brightness-110">
+                    <span className="mt-auto flex w-full shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-3 text-sm font-bold text-[#0b0b0f] shadow-glow-sm transition group-hover:brightness-110">
                       Подробнее
                     </span>
                   </button>

@@ -14,8 +14,8 @@ export function ExternalLinksSection({ platformUrl }: { platformUrl: string }) {
   const platformHref = normalizeExternalUrl(platformUrl);
 
   return (
-    <section className="px-4 py-10 sm:px-6 sm:py-12">
-      <div className="mx-auto max-w-xl">
+    <section className="px-4 pt-4 pb-10 sm:px-6 sm:pt-6 sm:pb-12">
+      <div className="mx-auto w-full max-w-3xl">
         <motion.div
           {...cardMotion}
           className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[rgba(15,17,23,0.9)] to-[rgba(11,11,15,0.95)] p-px shadow-card"
