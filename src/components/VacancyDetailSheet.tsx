@@ -65,6 +65,8 @@ export function VacancyDetailSheet({
   detail: VacancyDetail;
   onClose: () => void;
 }) {
+  const contactHref = (detail.telegramUrl || CONTACT_TELEGRAM_URL).trim();
+
   return (
     <motion.div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
@@ -145,10 +147,10 @@ export function VacancyDetailSheet({
 
             <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <ButtonLink
-                href={CONTACT_TELEGRAM_URL}
+                href={contactHref}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => trackEvent('telegram_connect', { href: CONTACT_TELEGRAM_URL })}
+                onClick={() => trackEvent('telegram_connect', { href: contactHref })}
                 className="w-full flex-1 font-bold"
               >
                 Связаться
