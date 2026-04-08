@@ -12,7 +12,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.info('[vacansia] App: mounted');
+    if (import.meta.env.DEV) {
+      console.info('[vacansia] App: mounted');
+    }
   }, []);
 
   return (

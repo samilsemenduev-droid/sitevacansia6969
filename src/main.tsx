@@ -7,27 +7,38 @@ import App from './App';
 import './styles/index.css';
 
 /**
- * HashRouter сопоставляет маршруты с hash. При открытии `https://хост/` hash пустой —
- * в частых конфигурациях RR6 не матчит `path="/"`, экран остаётся пустым. Явно ставим `#/`.
+ * HashRouter матчит путь из hash. Пустой hash → часто нет совпадения с `path="/"` → пустой экран.
  */
 function ensureHashRouterEntry(): void {
   if (typeof window === 'undefined') return;
-  const h = window.location.hash;
-  if (h === '' || h === '#') {
-    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`);
+  try {
+    const h = window.location.hash;
+    if (h === '' || h === '#') {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}#/`
+      );
+    }
+  } catch (e) {
+    console.error('[vacansia] bootstrap: ensureHashRouterEntry failed', e);
   }
 }
 
 ensureHashRouterEntry();
-console.info('[vacansia] bootstrap: start');
+
+if (import.meta.env.DEV) {
+  console.info('[vacansia] bootstrap: start');
+}
 
 const rootEl = document.getElementById('root');
 if (!rootEl) {
   console.error('[vacansia] bootstrap: #root not found');
   document.body.textContent = 'Ошибка: в разметке нет элемента #root.';
 } else {
-  console.info('[vacansia] bootstrap: #root ok, render');
-  queueMicrotask(() => console.info('[vacansia] bootstrap: microtask after schedule (проверка, что main.tsx дошёл до конца)'));
+  if (import.meta.env.DEV) {
+    console.info('[vacansia] bootstrap: #root ok, render');
+  }
   createRoot(rootEl).render(
     <StrictMode>
       <ErrorBoundary>
@@ -39,5 +50,7 @@ if (!rootEl) {
       </ErrorBoundary>
     </StrictMode>
   );
-  console.info('[vacansia] bootstrap: createRoot().render invoked');
+  if (import.meta.env.DEV) {
+    console.info('[vacansia] bootstrap: createRoot().render invoked');
+  }
 }

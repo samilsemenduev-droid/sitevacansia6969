@@ -1,0 +1,11 @@
+# Cloudflare Pages (статический вывод + Functions из папки /functions).
+#
+# НЕ используйте `wrangler deploy` без подкоманды pages — это деплой Worker, не сайта.
+# Правильно: подключить репозиторий в Dashboard → Pages, или:
+#   npm run build && npx wrangler pages deploy dist --project-name=<имя_проекта>
+#
+# Секреты (TELEGRAM_*) задаются в Dashboard → Pages → Settings → Environment variables.
+
+name = "sitevacansia"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"

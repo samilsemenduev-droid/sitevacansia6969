@@ -8,7 +8,15 @@ export default defineConfig(({ mode }) => {
   const apiPort = env.APP_PORT || env.PORT || '8787';
 
   return {
+    // Явно корень сайта: иначе при неверном base ассеты уйдут по неверным URL → белый экран на Pages.
+    base: '/',
     plugins: [react()],
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      emptyOutDir: true,
+      sourcemap: false,
+    },
     server: {
       proxy: {
         '/api': {
