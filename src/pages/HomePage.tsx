@@ -7,7 +7,6 @@ import { Hero } from '@/components/Hero';
 import { VacancyGrid } from '@/components/VacancyGrid';
 import { VacancyDetailSheet } from '@/components/VacancyDetailSheet';
 import { ApplyForm } from '@/components/ApplyForm';
-import { ExternalLinksSection } from '@/components/ExternalLinksSection';
 import { SiteFooter } from '@/components/SiteFooter';
 import type { SiteData } from '@/types';
 
@@ -40,7 +39,6 @@ function HomeContent({ data }: { data: SiteData }) {
         subtitle={data.site.heroSubtitle}
       />
       <VacancyGrid vacancies={data.vacancies} />
-      <ExternalLinksSection platformUrl={data.site.platformUrl} />
       <ApplyForm
         defaultCityId={enabledCities[0]?.id ?? ''}
         vacancies={data.vacancies}
